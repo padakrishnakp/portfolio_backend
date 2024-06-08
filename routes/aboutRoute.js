@@ -1,18 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { uploads } = require("../middlewares/upload");
-const {
-  aboutAdd,
-  aboutList,
-  aboutDelete,
-  aboutView,
-} = require("../controller/aboutController");
+const { videoUpload } = require("../middlewares/videoUpload");
+const { aboutAdd, aboutList, aboutDelete, aboutView ,aboutUpdated,aboutHomeDetails} = require("../controller/aboutController");
 
-// Handle POST request to upload file
-router.post("/about/add", uploads.single('about_file'), aboutAdd);
-
+router.post("/about/add", videoUpload.single('about_media'), aboutAdd);
+router.put("/about/updated/:id", videoUpload.single('about_media'), aboutUpdated);
 router.get("/about/list", aboutList);
-router.get("/about/view", aboutView);
+router.get("/about/view/:id", aboutView); 
 router.delete("/about/delete/:id", aboutDelete);
+router.get("/about/homeView/:userId", aboutHomeDetails);
 
 module.exports = router;

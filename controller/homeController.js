@@ -5,6 +5,8 @@ const { ObjectId } = require('mongodb');
 const homeAdd = async (req,res)=>{
     try{
         
+        console.log("Body Home add",req.body)
+
         const newHome = await home.create({
             user_id:req.user,
             description:req.body.description,
@@ -67,7 +69,7 @@ const homeView = async (req,res)=>{
         var geo = geoip.lookup(ip);
       console.log(geo);
 
-        const homeView = await home.find({user_id:req.user,status:true})
+        const homeView = await home.find({user_id:req.params.userId,status:true})
         res.status(200).json({
             success:true,
             data:homeView
@@ -99,23 +101,29 @@ const homeDetails = async (req,res)=>{
     }
 
 }
-const homeUpdated  = async (req,res)=>{
-    try {
-        var updated_data = {
-            description:req.body.description,
-            input_typing:req.body.input_typing,
-            status:req.body.status
+const homeUpdated = async (req, res) => {
+    try {      
+      const updated_data = {
+        $set: {
+          description: req.body.description,
+          status: req.body.status,
+          input_typing: req.body.input_typing 
         }
-        const homeUpdated = await home.findByIdAndUpdate(req.body.id,updated_data)
-        res.status(200).json({success:true,message:"Home Updated Successfully"})
-
-
-    }catch(e)
-    {
-        res.status(500).json({success:false,error:e})
+      };
+      
+      const homeUpdated = await home.findByIdAndUpdate(req.params.id, updated_data, { new: true });
+      
+      if (!homeUpdated) {
+        return res.status(404).json({ success: false, message: "Home not found" });
+      }
+      
+      res.status(200).json({ success: true, message: "Home Updated Successfully", data: homeUpdated });
+    } catch (e) {
+      console.error("Error updating home:", e);
+      res.status(500).json({ success: false, error: e.message });
     }
-
-}
+  };
+  
 
 
 module.exports = {homeAdd,homeView,homeDelete,homeList,homeDetails,homeUpdated};

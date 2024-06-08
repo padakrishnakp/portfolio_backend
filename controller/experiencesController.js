@@ -10,7 +10,8 @@ const experiencesAdd = async (req, res) => {
             roll:req.body.roll,
             joying_dated:req.body.joying_dated,
             last_dated:req.body.last_dated,
-            status:req.body.status
+            status:req.body.status,
+            user_id:req.body.userId
 
         })
     res.status(200).json({
@@ -27,7 +28,7 @@ const experiencesAdd = async (req, res) => {
 
 const experiencesList = async(req,res)=>{
    try{
-    let list_data = await experiences.find()
+    let list_data = await experiences.find({user_id:req.params.userId})
     res.status(200).json({
         success:true,
         message:"Experiences List",
@@ -78,4 +79,47 @@ const experiencesView = async (req,res)=>{
     }
 }
 
-module.exports = {experiencesAdd ,experiencesList,experiencesDelete,experiencesView};
+const experiencesDetails =  async (req,res)=>{
+    try{
+        let details_data = await experiences.findById(req.params.id)
+        res.status(200).json({
+            success:true,
+            message:"Experiences Details",
+            data:details_data
+        })
+    }
+    catch(e)
+    {
+        res.status(500).json({
+            success:false,
+            message:e
+        })
+    }
+}
+const experiencesUpdate = async (req,res)=>{
+    try {
+        let updated_data = {
+            company_name:req.body.company_name,
+            roll:req.body.roll,
+            joying_dated:req.body.joying_dated,
+            last_dated:req.body.last_dated,
+            status:req.body.status,
+
+        }
+        let experiences_update = await experiences.findByIdAndUpdate(req.params.id,updated_data)
+        res.status(200).json({
+            success:true,
+            message:"Successfully Updated Experience"
+        })
+
+    }catch(e)
+    {
+        res.status(500).json({
+            success:false,
+            message:e
+        })
+    }
+
+}
+
+module.exports = {experiencesAdd ,experiencesList,experiencesDelete,experiencesView,experiencesDetails,experiencesUpdate};

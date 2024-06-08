@@ -32,6 +32,13 @@ const userRegistration = async (req, res) => {
   }
 };
 
+async function genToken(user){
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+  return token;
+}
+
 const userLogin = async (req, res) => {
   try {
     let user = await User.findOne({ email_id: req.body.email_id });
@@ -53,19 +60,14 @@ const userLogin = async (req, res) => {
         message: "Invalid Password"
       });
     }
+    const token=await genToken(user)
+    let updated = await User.updateOne({email_id: req.body.email_id},{token:token})
+    console.log("updated:-",updated)
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
 
     console.log("Generated token:", token);
 
-    // Set cookie
-    res.cookie("jwt", token, {
-      maxAge: 1000 * 60 * 60 * 24 * 15, // 15 days
-      httpOnly: true,
-      // sameSite: "strict",
-    });
+   
 
     res.status(200).json({
       success: true,
@@ -80,7 +82,6 @@ const userLogin = async (req, res) => {
 
 
 
-    console.log("Cookie set successfully");
   } catch (error) {
     console.error("An error occurred during login:", error);
     res.status(500).json({

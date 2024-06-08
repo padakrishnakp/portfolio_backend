@@ -3,9 +3,9 @@ const User = require('../module/UserModule');
 
 const protectRoutes = async (req, res, next) => {
   try {
-    console.log('Start:------',req.headers)
-    const token = req.cookies.jwt;
-    console.log("TTTT:-",token)
+    let user_data = await User.findById(req.body.userId)
+    const token = user_data.token
+   
     if (!token) {
       return res.status(401).json({ error: "Unauthorized, no token provided!" });
     }

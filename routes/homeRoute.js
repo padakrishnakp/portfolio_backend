@@ -6,9 +6,9 @@ const { protectRoutes } = require('../middlewares/authTokenMiddleware');
 
 
 router.post("/home/homeAdd",protectRoutes,homeAdd)
-router.post("/home/homeUpdated",homeUpdated)
-router.get("/home/homeList",protectRoutes,homeList)
-router.get("/home/homeView",homeView)
+router.put("/home/homeUpdated/:id",homeUpdated)
+router.post("/home/homeList",protectRoutes,homeList)
+router.get("/home/homeView/:userId",homeView)
 router.get("/home/homeDetails/:id",homeDetails)
 router.delete("/home/homeDelete/:id",homeDelete)
 

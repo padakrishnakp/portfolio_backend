@@ -13,8 +13,8 @@ const projectAdd = async (req, res) => {
       project_url: formData.project_url,
       project_image: uploadedFile ? uploadedFile.path : '', 
       status: req.body.status,
-      created_at: Date.now(),
-      updated_at: Date.now()
+      user_id:req.body.userId
+      
     });
 
     res.status(200).json({
@@ -90,4 +90,50 @@ const projectList = async(req,res)=>{
       }
     }
 
-module.exports = { projectAdd,projectList,projectDelete,projectView };
+    const projectDetails = async (req,res)=>{
+
+      try{
+        let data = await  project.findById(req.params.id)
+        res.status(200).json({
+          success:true,
+          message:"Project view Successfully",
+          data:data
+        })
+
+      }catch(e)
+      {
+        console.log("EEE",e)
+        res.status(500).json({
+          success: false,
+          message: "Failed to create project",
+          error: e
+        });
+      }
+
+    }
+
+    const projectUpdated = async (req, res) => {
+      try {
+        console.log("Body:-",req.body)
+          const { id } = req.params;
+          const { project_name, project_description, project_url } = req.body;
+          const updateData = {
+              project_name,
+              project_description,
+              project_url
+          };
+          console.log("File:-",req.file)
+          if (req.file) {
+              updateData.Project_image = req.file.path;
+          }
+          const project = await project.findByIdAndUpdate(id, updateData, { new: true });
+          if (!project) {
+              return res.status(404).json({ success: false, message: "Project not found" });
+          }
+          res.status(200).json({ success: true, message: "Project updated successfully", data: project });
+      } catch (error) {
+          res.status(500).json({ success: false, message: "Server Error", error: error.message });
+      }
+  };
+
+module.exports = { projectAdd,projectList,projectDelete,projectView,projectDetails,projectUpdated };
